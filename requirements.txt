@@ -1,0 +1,7 @@
+Django==5.2.6
+langchain==0.3.7
+langgraph==0.2.34
+langsmith==0.1.137
+langchain-groq==0.2.0
+langchain-community==0.3.5
+typing-extensions==4.12.2

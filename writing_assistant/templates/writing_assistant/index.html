@@ -1,0 +1,240 @@
+{% extends 'writing_assistant/base.html' %}
+{% load static %}
+
+{% block title %}AI Writing Assistant - Home{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Main Writing Interface -->
+    <div class="col-lg-8 mb-4">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h4 class="card-title mb-0">
+                    <i class="fas fa-edit me-2"></i>Improve Your Writing
+                </h4>
+            </div>
+            <div class="card-body">
+                <form id="writing-form">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="input-text" class="form-label">
+                            <strong>Enter your text:</strong>
+                        </label>
+                        <textarea
+                            id="input-text"
+                            class="form-control"
+                            rows="6"
+                            placeholder="Type or paste your text here..."
+                            required
+                        ></textarea>
+                        <div class="form-text">
+                            The AI agent will automatically analyze your text and decide which tools to apply.
+                        </div>
+                    </div>
+
+                    <!-- Tool Selection (Optional) -->
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <strong>Specific Tools (Optional):</strong>
+                        </label>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="tools" value="grammar_corrector" id="grammar">
+                                    <label class="form-check-label" for="grammar">
+                                        <i class="fas fa-spell-check text-success"></i> Grammar Correction
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="tools" value="sentence_rewriter" id="sentence">
+                                    <label class="form-check-label" for="sentence">
+                                        <i class="fas fa-pen-alt text-info"></i> Sentence Rewriting
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="tools" value="vocabulary_enhancer" id="vocabulary">
+                                    <label class="form-check-label" for="vocabulary">
+                                        <i class="fas fa-book text-warning"></i> Vocabulary Enhancement
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="tools" value="tone_adjuster" id="tone">
+                                    <label class="form-check-label" for="tone">
+                                        <i class="fas fa-adjust text-secondary"></i> Tone Adjustment
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tone Selection -->
+                    <div class="mb-3">
+                        <label for="tone-select" class="form-label">
+                            <strong>Tone (Optional):</strong>
+                        </label>
+                        <select id="tone-select" name="tone" class="form-select">
+                            <option value="">Let the agent decide</option>
+                            <option value="formal">Formal</option>
+                            <option value="casual">Casual</option>
+                            <option value="professional">Professional</option>
+                            <option value="friendly">Friendly</option>
+                        </select>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="mb-3">
+                        <button type="submit" class="btn btn-primary btn-lg me-2" id="improve-btn">
+                            <i class="fas fa-magic me-2"></i>Improve Text
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" id="analyze-btn">
+                            <i class="fas fa-search me-2"></i>Analyze Only
+                        </button>
+                        <button type="button" class="btn btn-outline-warning" id="clear-btn">
+                            <i class="fas fa-eraser me-2"></i>Clear
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Loading Indicator -->
+                <div id="loading" class="text-center d-none">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Processing...</span>
+                    </div>
+                    <p class="mt-2">AI agent is analyzing and improving your text...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="results-section" class="card shadow mt-4 d-none">
+            <div class="card-header bg-success text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-check-circle me-2"></i>Results
+                </h5>
+            </div>
+            <div class="card-body" id="results-content">
+                <!-- Results will be populated here -->
+            </div>
+        </div>
+
+        <!-- Analysis Section -->
+        <div id="analysis-section" class="card shadow mt-4 d-none">
+            <div class="card-header bg-info text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-microscope me-2"></i>Text Analysis
+                </h5>
+            </div>
+            <div class="card-body" id="analysis-content">
+                <!-- Analysis will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+        <!-- Quick Info -->
+        <div class="card shadow mb-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-info-circle me-2"></i>How It Works
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="feature-item mb-3">
+                    <div class="d-flex align-items-center">
+                        <div class="feature-icon bg-primary text-white rounded-circle me-3">1</div>
+                        <div>
+                            <strong>Smart Analysis</strong><br>
+                            <small class="text-muted">AI agent analyzes your text automatically</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="feature-item mb-3">
+                    <div class="d-flex align-items-center">
+                        <div class="feature-icon bg-success text-white rounded-circle me-3">2</div>
+                        <div>
+                            <strong>Tool Selection</strong><br>
+                            <small class="text-muted">Agent decides which tools to apply based on your text</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="d-flex align-items-center">
+                        <div class="feature-icon bg-warning text-white rounded-circle me-3">3</div>
+                        <div>
+                            <strong>Improvements</strong><br>
+                            <small class="text-muted">Get enhanced text with detailed explanations</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Available Tools -->
+        <div class="card shadow mb-4">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-tools me-2"></i>Available Tools
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="tool-item mb-2">
+                    <i class="fas fa-spell-check text-success me-2"></i>
+                    <strong>Grammar Corrector</strong><br>
+                    <small class="text-muted">Fixes grammar, spelling, and punctuation</small>
+                </div>
+                <hr>
+                <div class="tool-item mb-2">
+                    <i class="fas fa-pen-alt text-info me-2"></i>
+                    <strong>Sentence Rewriter</strong><br>
+                    <small class="text-muted">Improves sentence structure and clarity</small>
+                </div>
+                <hr>
+                <div class="tool-item mb-2">
+                    <i class="fas fa-book text-warning me-2"></i>
+                    <strong>Vocabulary Enhancer</strong><br>
+                    <small class="text-muted">Replaces basic words with sophisticated alternatives</small>
+                </div>
+                <hr>
+                <div class="tool-item">
+                    <i class="fas fa-adjust text-secondary me-2"></i>
+                    <strong>Tone Adjuster</strong><br>
+                    <small class="text-muted">Adjusts writing tone for different contexts</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Improvements -->
+        {% if recent_improvements %}
+        <div class="card shadow">
+            <div class="card-header bg-dark text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-history me-2"></i>Recent Improvements
+                </h5>
+            </div>
+            <div class="card-body">
+                {% for improvement in recent_improvements %}
+                <div class="recent-item mb-2 pb-2 border-bottom">
+                    <small class="text-muted">{{ improvement.created_at|timesince }} ago</small><br>
+                    <small>{{ improvement.original_text|truncatechars:60 }}</small><br>
+                    <span class="badge bg-primary">{{ improvement.tools_used_display }}</span>
+                </div>
+                {% endfor %}
+                <a href="{% url 'writing_assistant:history' %}" class="btn btn-sm btn-outline-dark mt-2">
+                    View All History
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // The main JavaScript functionality will be in main.js
+    // This ensures the page-specific interactions are handled properly
+</script>
+{% endblock %}

@@ -1,0 +1,183 @@
+{% extends 'writing_assistant/base.html' %}
+{% load static %}
+
+{% block title %}AI Writing Assistant - Statistics{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Overview Cards -->
+    <div class="col-md-6 mb-4">
+        <div class="card shadow border-primary">
+            <div class="card-body text-center">
+                <i class="fas fa-file-alt fa-3x text-primary mb-3"></i>
+                <h3 class="card-title">{{ total_improvements }}</h3>
+                <p class="card-text text-muted">Total Improvements</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-4">
+        <div class="card shadow border-success">
+            <div class="card-body text-center">
+                <i class="fas fa-tools fa-3x text-success mb-3"></i>
+                <h3 class="card-title">{{ tool_stats|length }}</h3>
+                <p class="card-text text-muted">Active Tools</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Tool Usage Statistics -->
+    <div class="col-lg-8 mb-4">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h4 class="card-title mb-0">
+                    <i class="fas fa-chart-bar me-2"></i>Tool Usage Statistics
+                </h4>
+            </div>
+            <div class="card-body">
+                {% if tool_stats %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Tool</th>
+                                    <th>Usage Count</th>
+                                    <th>Last Used</th>
+                                    <th>Usage Percentage</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for stat in tool_stats %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            {% if stat.tool_name == 'grammar_corrector' %}
+                                                <i class="fas fa-spell-check text-success me-2"></i>
+                                            {% elif stat.tool_name == 'sentence_rewriter' %}
+                                                <i class="fas fa-pen-alt text-info me-2"></i>
+                                            {% elif stat.tool_name == 'vocabulary_enhancer' %}
+                                                <i class="fas fa-book text-warning me-2"></i>
+                                            {% elif stat.tool_name == 'tone_adjuster' %}
+                                                <i class="fas fa-adjust text-secondary me-2"></i>
+                                            {% else %}
+                                                <i class="fas fa-cog text-muted me-2"></i>
+                                            {% endif %}
+                                            {{ stat.tool_name|title|cut:"_" }}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-primary">{{ stat.usage_count }}</span>
+                                    </td>
+                                    <td>
+                                        <small>{{ stat.last_used|timesince }} ago</small>
+                                    </td>
+                                    <td>
+                                        {% widthratio stat.usage_count total_improvements 100 as percentage %}
+                                        <div class="progress" style="height: 20px;">
+                                            <div class="progress-bar" role="progressbar"
+                                                 style="width: {{ percentage }}%"
+                                                 aria-valuenow="{{ percentage }}"
+                                                 aria-valuemin="0"
+                                                 aria-valuemax="100">
+                                                {{ percentage }}%
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-chart-bar fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No usage statistics yet</h5>
+                        <p class="text-muted">Statistics will appear after using the writing tools.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Tool Information -->
+    <div class="col-lg-4">
+        <div class="card shadow">
+            <div class="card-header bg-info text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-info-circle me-2"></i>Tool Information
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="tool-info mb-3">
+                    <h6 class="text-primary">
+                        <i class="fas fa-spell-check me-2"></i>Grammar Corrector
+                    </h6>
+                    <p class="small text-muted">
+                        Automatically fixes grammar errors, spelling mistakes, and punctuation issues.
+                        High priority tool applied first by the agent.
+                    </p>
+                </div>
+
+                <div class="tool-info mb-3">
+                    <h6 class="text-info">
+                        <i class="fas fa-pen-alt me-2"></i>Sentence Rewriter
+                    </h6>
+                    <p class="small text-muted">
+                        Improves sentence structure, removes wordiness, and enhances clarity.
+                        Applied when complex sentences are detected.
+                    </p>
+                </div>
+
+                <div class="tool-info mb-3">
+                    <h6 class="text-warning">
+                        <i class="fas fa-book me-2"></i>Vocabulary Enhancer
+                    </h6>
+                    <p class="small text-muted">
+                        Replaces basic words with more sophisticated alternatives.
+                        Triggered when high ratio of basic vocabulary is detected.
+                    </p>
+                </div>
+
+                <div class="tool-info">
+                    <h6 class="text-secondary">
+                        <i class="fas fa-adjust me-2"></i>Tone Adjuster
+                    </h6>
+                    <p class="small text-muted">
+                        Adjusts writing tone for different contexts (formal, casual, professional, friendly).
+                        Always available for fine-tuning.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="card shadow mt-4">
+            <div class="card-header bg-dark text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-rocket me-2"></i>Quick Actions
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'writing_assistant:index' %}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Improve New Text
+                    </a>
+                    <a href="{% url 'writing_assistant:history' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-history me-2"></i>View History
+                    </a>
+                </div>
+
+                <hr>
+
+                <div class="text-center">
+                    <small class="text-muted">
+                        <i class="fas fa-lightbulb me-1"></i>
+                        The AI agent automatically decides which tools to use based on your text analysis.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
