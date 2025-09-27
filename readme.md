@@ -1,4 +1,4 @@
-# AI Writing Assistant with LangGraph Agent
+# AI Writing Assistant Agent
 
 ## 📋 Project Overview
 
